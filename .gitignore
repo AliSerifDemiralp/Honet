@@ -1,0 +1,62 @@
+git_token.txt
+/git_token.txt
+
+# ----------------------
+# Python
+# ----------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+
+# Coverage / test
+.coverage
+htmlcov/
+.pytest_cache/
+
+# ----------------------
+# Environment variables
+# ----------------------
+.env
+.env.*
+*.env
+
+# ----------------------
+# SQLite
+# ----------------------
+*.sqlite3
+*.db
+*.db-journal
+
+# ----------------------
+# Streamlit
+# ----------------------
+.streamlit/secrets.toml
+.streamlit/*.toml
+
+# ----------------------
+# IDE
+# ----------------------
+.vscode/
+.idea/
+
+# ----------------------
+# OS
+# ----------------------
+.DS_Store
+Thumbs.db

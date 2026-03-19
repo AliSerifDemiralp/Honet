@@ -45,7 +45,7 @@ def check_session_timeout():
         if now - st.session_state.last_activity > timedelta(minutes=SESSION_TIMEOUT_MINUTES):
             st.session_state.auth = False
             st.session_state.last_activity = None
-            st.warning("Session expired")
+            st.warning(" ⏱ Session expired")
             st.rerun()
 
     st.session_state.last_activity = now
@@ -58,7 +58,7 @@ def login():
     ip = get_client_ip()
 
     if is_locked(ip):
-        st.error("Too many failed attempts. Try again later.")
+        st.error(" 🚨 Too many failed attempts. Try again later.")
         return
 
     username = st.text_input("Username")
@@ -73,7 +73,7 @@ def login():
             st.rerun()
         else:
             record_failed_attempt(ip)
-            st.error("Invalid credentials")
+            st.error(" 🚨 Invalid credentials")
 
 
 def get_client_ip():
@@ -150,7 +150,7 @@ def get_devices():
 # ---- MANUAL SCAN ----
 def run_manual_scan():
     subprocess.run(["sudo", "python3", SCAN_SCRIPT])
-    st.success("Scan completed")
+    st.success(" 🟢 Scan completed")
 
 
 # ---- Time Prettier ----
@@ -161,7 +161,8 @@ def format_last_seen(ts_string):
 # ---- DASHBOARD ----
 def dashboard():
     check_session_timeout()
-
+    st.title(" 📟 Honet Network Visibility")
+    st.divider()
     col_top1, col_top2 = st.columns([6, 1])
 
     with col_top2:
@@ -171,15 +172,14 @@ def dashboard():
             st.rerun()
 
     with col_top1:
-        if st.button("Run Manual Scan"):
+        if st.button(" 📡 Run Manual Scan"):
             run_manual_scan()
 
-    st.title("$ Honet Network Visibility")
+    
     st.divider()
-
     devices = get_devices()
 
-    st.subheader("Devices")
+    st.subheader("Discovered Devices")
     st.divider()
 
     for d in devices:

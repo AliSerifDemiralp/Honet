@@ -49,3 +49,4 @@ Execute the commands below:
 - 🧾 Bash installer script
 - 🐳 Docker support (optimized for RPi Zero W – 1 CPU / ~500MB RAM)
 - 📤 Log & DB export
+test

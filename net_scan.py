@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, UTC
 from functools import lru_cache
 from sqlite import init_db, save_scan
+import sys
 
 COMMON_PORTS = [
     # File Transfer
@@ -431,24 +432,10 @@ def run_scan(network: str) -> dict:
 
 
 if __name__ == "__main__":
-    network = "192.168.1.0/24"
+    network = sys.argv[1] if len(sys.argv) > 1 else "192.168.1.0/24"
+    print("ARGV:", sys.argv)
     init_db()
     output = run_scan(network)
-
     save_scan(output["devices"])
 
     print(f"Scan completed. {len(output['devices'])} devices recorded in SQLite.")
-    
-    #with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    #    json.dump(output, f, indent=4, ensure_ascii=False)
-
-    ##with open(STATE_FILE, "w", encoding="utf-8") as f:
-    ##    json.dump({"devices": output["devices"]}, f, indent=4, ensure_ascii=False)
-
-    #print(f"Scan saved to {OUTPUT_FILE}")
-    #print(
-    #    f"Devices: {output['device_count']} | "
-    #    f"Added: {len(output['changes']['added'])} | "
-    #    f"Removed: {len(output['changes']['removed'])} | "
-    #    f"Changed: {len(output['changes']['changed'])}"
-    #)

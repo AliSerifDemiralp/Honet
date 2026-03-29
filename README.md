@@ -27,26 +27,26 @@ Execute the commands below:
 2. 🔓 `source .venv/bin/activate`
 3. 📂 `cd Honet`
 4. 📦 `pip install -r requirements.txt`
-5. ▶ `streamlit run streamlit_app.py`
+5. ▶ `streamlit run app.py`
 6. 🌐 Open your browser and navigate to port **8501**
 
 ---
 
 ## 🔐 Features
 
-- 📡 Network discovery (ARP based)
-- 🚪 Open port detection
-- 🧠 Device classification
-- 🗂 SQLite forensic logging
-- 🔒 Login protection + brute-force guard
+- 📡 Network discovery based on custom CIDR (ARP based)
+- 🚪 Open port detection (Builtin limited)
+- 🧠 Auto device classification
+- 🗂 SQLite forensic logging to portal
+- 🔒 Login protection + brute-force guard (Session based)
 - 🛑 Session timeout
-
+- ⏱ Scheduled scans
+- 🔐 SSL / HTTPS support
+    - Supported by Streamlit but not recommended due to security/performance reasons
+- 📤 PDF report & RAW DB export
 ---
 
 ## 🧪 Improvements (Not Scheduled)
-- ⏱ Scheduled scans
-- 🔐 SSL / HTTPS support
 - 🧾 Bash installer script
-- 🐳 Docker support (optimized for RPi Zero W – 1 CPU / ~500MB RAM)
-- 📤 Log & DB export
-test
+- 🐳 Docker support (Currently optimized for RPi Zero W – 1 CPU / ~500MB RAM)
+

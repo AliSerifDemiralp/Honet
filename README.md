@@ -1,12 +1,12 @@
 # 🛡 Honet
 
-🛰 Honet: Home Network Monitor is a scheduled network scanner for complete visibility across your home network.
+🛰 Honet: Homelab Network Monitor is a scheduled network scanner for complete visibility across your home network.
 
 ---
 
-## 🧰 Tech Stack
+## 🧰 Current Tech Stack
 
-- 🐍 Python 3.12.3  
+- 🐍 Python 3.12.13
 - 🎛 Streamlit 1.55.0  
 - 🗄 SQLite 3.45.1  
 - 📡 Nmap 7.94SVN  
@@ -23,12 +23,16 @@
 
 Execute the commands below:
 
-1. 🧪 `python3 -m venv .venv`
-2. 🔓 `source .venv/bin/activate`
-3. 📂 `cd Honet`
-4. 📦 `pip install -r requirements.txt`
-5. ▶ `streamlit run app.py`
-6. 🌐 Open your browser and navigate to port **8501**
+1. `git clone https://github.com/AliSerifDemiralp/Honet.git`
+2. `cd Honet`
+3. `python3 -m venv .venv`
+4. `source .venv/bin/activate`
+5. `pip install -r requirements.txt`
+6. `streamlit run app.py`
+
+## 🐳 For Docker
+
+`docker compose -f deploy/docker/docker-compose.yml up -d`
 
 ---
 

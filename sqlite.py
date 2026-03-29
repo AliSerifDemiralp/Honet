@@ -1,8 +1,8 @@
 import sqlite3
-from datetime import datetime, UTC
+from datetime import datetime, UTC, timedelta
 import os
 
-DB_FILE = "honet.db"
+DB_FILE = os.environ.get("HONET_DB_PATH", "honet.db")
 
 def init_db():
     if os.path.exists(DB_FILE):
@@ -166,7 +166,6 @@ def record_failed_attempt(ip):
         VALUES (?, ?, 0)
     """, (ip, now.isoformat()))
 
-    # Son 10 dakika içinde fail say
     ten_min_ago = now - timedelta(minutes=10)
 
     c.execute("""
@@ -185,6 +184,30 @@ def record_failed_attempt(ip):
 
     conn.commit()
     conn.close()
+    
+def record_successful_attempt(ip):
+    now = datetime.now(UTC)
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("""
+        INSERT INTO login_attempts (ip, attempt_time, success)
+        VALUES (?, ?, 1)
+    """, (ip, now.isoformat()))
+    conn.commit()
+    conn.close()
+    
+def get_login_history(limit=50):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("""
+        SELECT ip, attempt_time, success 
+        FROM login_attempts 
+        ORDER BY attempt_time DESC
+        LIMIT ?
+    """, (limit,))
+    records = c.fetchall()
+    conn.close()
+    return records
 
 def get_devices_with_ports():
     conn = sqlite3.connect(DB_FILE)

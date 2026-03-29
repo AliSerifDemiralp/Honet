@@ -42,7 +42,15 @@ htmlcov/
 *.sqlite3
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 
+# ----------------------
+# Files to ignore for scans
+# ----------------------
+*.lock
+.scan_state.json
+scan_result.json
 # ----------------------
 # Streamlit
 # ----------------------

@@ -37,6 +37,34 @@ COMMON_PORTS = [
 
 OUTPUT_FILE = "scan_result.json"
 STATE_FILE = ".scan_state.json"
+LOCK_FILE = "honet_scan.lock"
+
+# ---- LOGGING ----
+def log(msg):
+    print(f"[{datetime.now().isoformat()}] {msg}", flush=True)
+
+# ---- ENVIRONMENT DETECTION ----
+def is_container() -> bool:
+    return (
+        os.path.exists("/.dockerenv") or
+        os.environ.get("container") is not None or
+        (os.path.exists("/proc/1/cgroup") and
+         "docker" in open("/proc/1/cgroup").read())
+    )
+
+def build_discovery_cmd(network: str) -> list[str]:
+    base = ["nmap", "-sn", "-n", "--max-rate", "20"]
+    if is_container():
+        log("⚠ Container environment detected")
+        base += ["-PE", "--send-ip"]
+    else:
+        log("⚠ Bare metal environment detected")
+        base += ["-PR", "-PE"]
+    base.append(network)
+    return base
+
+def get_max_rate() -> str:
+    return "15" if is_container() else "20"
 
 
 def run_nmap_xml(cmd: list[str]) -> ET.Element:
@@ -134,13 +162,7 @@ def extract_hostnames(host_elem: ET.Element) -> list[str]:
 
 
 def discover_hosts(network: str) -> list[dict]:
-    root = run_nmap_xml([
-        "nmap",
-        "-sn",
-        "-PR",
-        "-n",
-        network
-    ])
+    root = run_nmap_xml(build_discovery_cmd(network))
 
     hosts: list[dict] = []
 
@@ -188,7 +210,7 @@ def bulk_scan_ports(hosts: list[dict], ports: list[int]) -> dict[str, list[int]]
         "-T3",
         "-n",
         "-Pn",
-        "--max-rate", "50",
+        "--max-rate", get_max_rate(),
         "--open",
         "-p", port_str,
         *ip_list
@@ -431,11 +453,33 @@ def run_scan(network: str) -> dict:
     return result
 
 
-if __name__ == "__main__":
-    network = sys.argv[1] if len(sys.argv) > 1 else "192.168.1.0/24"
-    print("ARGV:", sys.argv)
-    init_db()
-    output = run_scan(network)
-    save_scan(output["devices"])
+def acquire_lock() -> bool:
+    if os.path.exists(LOCK_FILE):
+        try:
+            with open(LOCK_FILE, "r") as f:
+                pid = int(f.read().strip())
+            os.kill(pid, 0)
+            return False
+        except (ProcessLookupError, ValueError):
+            os.remove(LOCK_FILE)
 
-    print(f"Scan completed. {len(output['devices'])} devices recorded in SQLite.")
+    with open(LOCK_FILE, "w") as f:
+        f.write(str(os.getpid()))
+    return True
+
+def release_lock():
+    if os.path.exists(LOCK_FILE):
+        os.remove(LOCK_FILE)
+
+if __name__ == "__main__":
+    if not acquire_lock():
+        print("Scan already running, skipping.")
+        sys.exit(0)
+    try:
+        network = sys.argv[1] if len(sys.argv) > 1 else "192.168.1.0/24"
+        log("⚠ Script triggered with these arguments: " + str(sys.argv) + f" (detected network: {network})")
+        output = run_scan(network)
+        save_scan(output["devices"])
+        log(f"⚠ Scan completed. {len(output['devices'])} devices recorded in database")
+    finally:
+        release_lock()

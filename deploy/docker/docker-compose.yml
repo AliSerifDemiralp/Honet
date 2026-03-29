@@ -1,0 +1,15 @@
+services:
+  honet:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    network_mode: host
+    volumes:
+      - honet_data:/data
+    restart: unless-stopped
+    environment:
+      - TZ=UTC
+      - HONET_DB_PATH=/data/honet.db
+
+volumes:
+  honet_data:

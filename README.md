@@ -49,4 +49,4 @@ Execute the commands below:
 ## 🧪 Improvements (Not Scheduled)
 - 🧾 Bash installer script
 - 🐳 Docker support (Currently optimized for RPi Zero W – 1 CPU / ~500MB RAM)
-
+- 

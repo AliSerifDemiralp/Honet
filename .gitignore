@@ -51,6 +51,9 @@ htmlcov/
 *.lock
 .scan_state.json
 scan_result.json
+*.pdf
+*.txt
+
 # ----------------------
 # Streamlit
 # ----------------------

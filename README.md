@@ -44,9 +44,9 @@ Execute the commands below:
 - 🔐 SSL / HTTPS support
     - Supported by Streamlit but not recommended due to security/performance reasons
 - 📤 PDF report & RAW DB export
+- 🐳 Docker support (Currently optimized for RPi Zero W – 1 CPU / ~500MB RAM)
 ---
 
 ## 🧪 Improvements (Not Scheduled)
-- 🧾 Bash installer script
-- 🐳 Docker support (Currently optimized for RPi Zero W – 1 CPU / ~500MB RAM)
-- 
+- Telegram Notification
+- Rule Management

@@ -58,7 +58,6 @@ scan_result.json
 # Streamlit
 # ----------------------
 .streamlit/secrets.toml
-.streamlit/*.toml
 
 # ----------------------
 # IDE

@@ -75,6 +75,8 @@ Honet is a lightweight homelab network monitoring tool with Nmap scanning and St
 
 ## 📸 Screenshots
 
+### 🖥 Web UI
+
 <p align="center">
   <img src="docs/images/web-login.png" width="800">
 </p>
@@ -88,17 +90,18 @@ Honet is a lightweight homelab network monitoring tool with Nmap scanning and St
 </p>
 
 
+### 📱 Mobile UI
 
 <p align="center">
-  <img src="docs/images/mobile-login.png" width="800">
-</p>
-
-<p align="center">
-  <img src="docs/images/mobile-main.png" width="800">
-</p>
-
-<p align="center">
-  <img src="docs/images/mobile-menu.png" width="800">
+  <a href="docs/images/mobile-login.png">
+    <img src="docs/images/mobile-login.png" width="180">
+  </a>
+  <a href="docs/images/mobile-main.png">
+    <img src="docs/images/mobile-main.png" width="180">
+  </a>
+  <a href="docs/images/mobile-menu.png">
+    <img src="docs/images/mobile-menu.png" width="180">
+  </a>
 </p>
 
 ---

@@ -147,7 +147,15 @@ def login():
 
 def get_client_ip():
     try:
-        return st.context.headers.get("x-forwarded-for", "local")
+        headers = st.context.headers
+
+        if "x-forwarded-for" in headers:
+            return headers["x-forwarded-for"].split(",")[0].strip()
+
+        if "x-real-ip" in headers:
+            return headers["x-real-ip"]
+
+        return "local"
     except:
         return "local"
 

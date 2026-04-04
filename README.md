@@ -1,21 +1,105 @@
-# 🛡 Honet
+# HONET
 
-🛰 Honet: Homelab Network Monitor is a scheduled network scanner for complete visibility across your home network.
+Honet is a lightweight homelab network monitoring tool with Nmap scanning and Streamlit dashboard
 
 ---
 
 ## 🧰 Current Tech Stack
 
-- 🐍 Python 3.12.13
-- 🎛 Streamlit 1.55.0  
-- 🗄 SQLite 3.45.1  
-- 📡 Nmap 7.94SVN  
-
----
+- Python 3.12.13
+- Streamlit 1.55.0  
+- SQLite 3.45.1  
+- Nmap 7.94SVN
 
 ## 🖥 Development Platform
 
 - 🐧 Ubuntu 24.04.3 LTS (Noble Numbat)
+
+---
+
+## 🔐 Features
+
+- 📡 Network Discovery
+    Identify active devices within custom CIDR ranges using ARP-based scanning.
+- 🚪 Port Detection
+    Detect open ports with a built-in (limited) scanning capability.
+- 🧠 Device Classification
+    Automatically categorize discovered devices based on observed characteristics.
+- 🗂 Forensic Logging
+    Store all scan data in a SQLite database, accessible through the web portal.
+- 🔒 Authentication & Protection
+    Secure login system with session-based brute-force protection.
+- 🛑 Session Management
+    Automatic session timeout to reduce unauthorized access risk.
+- ⏱ Scheduled Scanning
+    Configure periodic scans for continuous monitoring.
+- 🔐 SSL / HTTPS Support
+    Supported via Streamlit, though not recommended due to security and performance limitations.
+- 📤 Data Export
+    Generate PDF reports and export raw database files.
+- 🐳 Docker Support
+    Containerized deployment, optimized for low-resource environments (e.g., Raspberry Pi Zero W).
+- 🤳 Mobile-Friendly UI
+    Responsive interface enabled by Streamlit for access across devices.
+
+---
+
+
+## 👟 How It Runs
+
+- User Setup
+    Create an account to gain access to the system.
+- Target Configuration
+    Define network ranges using CIDR notation.
+- Scanning Process
+    Execute Nmap scans either manually or via scheduled tasks.
+- Data Storage
+    Persist scan results in a SQLite database.
+- Visualization
+    Explore and analyze results through a Streamlit-based interface.
+- Report & Investigation
+    Get raw database or generate PDF report.
+- Optional Logging Layer
+    Integrate a reverse proxy to capture and log incoming IP addresses.
+
+## ⛔ Limitations
+
+- Docker environment may not detect all devices (especially mobile)
+- For full network visibility, run on host system
+
+## 🛡️ Security
+
+- Runs locally by default
+- Reverse proxy recommended for public exposure
+- No sensitive data stored
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="docs/images/web-login.png" width="800">
+</p>
+
+<p align="center">
+  <img src="docs/images/web-main.png" width="800">
+</p>
+
+<p align="center">
+  <img src="docs/images/web-main2.png" width="800">
+</p>
+
+
+
+<p align="center">
+  <img src="docs/images/mobile-login.png" width="800">
+</p>
+
+<p align="center">
+  <img src="docs/images/mobile-main.png" width="800">
+</p>
+
+<p align="center">
+  <img src="docs/images/mobile-menu.png" width="800">
+</p>
 
 ---
 
@@ -66,6 +150,8 @@ Enable Configuration
 6. `sudo nginx -t`
 7. `sudo systemctl restart nginx`
 
+
+
 🚩 Firewall (Recommended)
 
 Allow only HTTP/HTTPS:
@@ -88,27 +174,14 @@ Notes:
 
 </details>
 
+---
+
 ## 🐳 For Docker
 
 `docker compose -f deploy/docker/docker-compose.yml up -d`
 
 ---
 
-## 🔐 Features
-
-- 📡 Network discovery based on custom CIDR (ARP based)
-- 🚪 Open port detection (Builtin limited)
-- 🧠 Auto device classification
-- 🗂 SQLite forensic logging to portal
-- 🔒 Login protection + brute-force guard (Session based)
-- 🛑 Session timeout
-- ⏱ Scheduled scans
-- 🔐 SSL / HTTPS support
-    - Supported by Streamlit but not recommended due to security/performance reasons
-- 📤 PDF report & RAW DB export
-- 🐳 Docker support (Currently optimized for RPi Zero W – 1 CPU / ~500MB RAM)
----
-
 ## 🧪 Improvements (Not Scheduled)
-- Telegram Notification
+- Telegram Uptime Notifications
 - Rule Management

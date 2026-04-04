@@ -1,8 +1,7 @@
 services:
   honet:
-    build:
-      context: ../..
-      dockerfile: deploy/docker/Dockerfile
+    image: thesheriff/honet:latest
+    container_name: honet
     network_mode: host
     volumes:
       - honet_data:/data

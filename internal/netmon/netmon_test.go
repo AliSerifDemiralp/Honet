@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"net/netip"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -61,13 +62,13 @@ func TestAggregatorFlushesOnWindowChange(t *testing.T) {
 }
 
 type fakePinger struct {
-	calls int
+	calls atomic.Int32
 	err   error
 	rtts  map[string][]time.Duration
 }
 
 func (f *fakePinger) Ping(ctx context.Context, ip netip.Addr, n int, timeout time.Duration) ([]time.Duration, error) {
-	f.calls++
+	f.calls.Add(1)
 	if f.err != nil {
 		return nil, f.err
 	}
@@ -103,8 +104,8 @@ func TestMonitorSkipsWhenBusy(t *testing.T) {
 	if err := m.Once(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	if p.calls != 0 {
-		t.Fatalf("pinger called %d times while busy", p.calls)
+	if p.calls.Load() != 0 {
+		t.Fatalf("pinger called %d times while busy", p.calls.Load())
 	}
 }
 
@@ -181,7 +182,7 @@ func TestRunSavesPartialWindowOnStop(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan struct{})
 	go func() { m.Run(ctx, func() time.Duration { return time.Hour }); close(done) }()
-	for i := 0; i < 200 && p.calls < 2; i++ {
+	for i := 0; i < 200 && p.calls.Load() < 2; i++ {
 		time.Sleep(5 * time.Millisecond)
 	}
 	cancel()

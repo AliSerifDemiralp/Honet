@@ -1,0 +1,60 @@
+{{define "content"}}{{with .Data}}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0 me-auto">Internet</h1>
+  <form method="post" action="/internet/test">
+    <input type="hidden" name="csrf" value="{{$.CSRF}}">
+    <button class="btn btn-success btn-sm" type="submit"{{if .SpeedRunning}} disabled{{end}}>{{if .SpeedRunning}}Speed test running…{{else}}Test speed now{{end}}</button>
+  </form>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <h2 class="h6">Latency (last 5 minutes)</h2>
+      {{if .LatErr}}<div class="alert alert-warning small mb-2">Latency measurement is not available: {{.LatErr}}.
+        Honet needs the CAP_NET_RAW capability to send pings.</div>{{end}}
+      {{if .LatencyOff}}<p class="small text-secondary">The latency monitor is off (Settings).</p>{{end}}
+      {{if .Latest}}
+      <table class="table table-sm small mb-0">
+        <thead><tr><th>Target</th><th>Avg</th><th>Min–max</th><th>Jitter</th><th>Loss</th></tr></thead>
+        <tbody>{{range .Latest}}
+          <tr{{if ge .LossPct 80.0}} class="table-danger"{{end}}><td>{{.Target}}</td>
+            <td>{{if lt .LossPct 100.0}}{{printf "%.1f" .AvgMs}} ms{{else}}—{{end}}</td>
+            <td>{{if lt .LossPct 100.0}}{{printf "%.1f–%.1f" .MinMs .MaxMs}}{{else}}—{{end}}</td>
+            <td>{{printf "%.1f" .JitterMs}}</td><td>{{printf "%.0f" .LossPct}}%</td></tr>
+        {{end}}</tbody>
+      </table>
+      {{range .Latest}}{{if and (ne .Target "gateway") (ge .DNSMs 0.0)}}<p class="small text-secondary mt-2 mb-0">DNS lookup: {{printf "%.0f" .DNSMs}} ms</p>{{break}}{{end}}{{end}}
+      {{else if not .LatErr}}<p class="small text-secondary mb-0">No measurements yet; the first summary appears after about 5 minutes.</p>{{end}}
+    </div></div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <h2 class="h6">Last speed test</h2>
+      {{with .Last}}
+        {{if .Error}}<p class="text-danger small mb-1">Failed {{ago .At}}: {{.Error}}</p>
+        {{else}}
+        <div class="d-flex gap-4">
+          <div><div class="stat-label">Download</div><div class="fs-4 text-honet">{{printf "%.1f" .DownMbps}} <small>Mbps</small></div></div>
+          <div><div class="stat-label">Upload</div><div class="fs-4">{{printf "%.1f" .UpMbps}} <small>Mbps</small></div></div>
+          <div><div class="stat-label">Latency under load</div><div class="fs-4">{{printf "%.0f" .LoadedMs}} <small>ms</small></div></div>
+        </div>
+        <p class="small text-secondary mb-0">{{when .At}} · {{ibytes .Bytes}} used</p>
+        {{end}}
+      {{else}}<p class="small text-secondary mb-1">No speed test yet.</p>{{end}}
+      {{if .Limited}}<p class="small text-warning mt-2 mb-0">This result may be limited by the Pi: a Pi Zero W tops out at about {{printf "%.0f" .PiLimit}} Mbps over Wi-Fi, so your connection may be faster.</p>{{end}}
+      {{if .SpeedOff}}<p class="small text-secondary mt-2 mb-0">Scheduled speed tests are off (Settings).</p>{{end}}
+      <p class="small text-secondary mt-2 mb-0">Uses Cloudflare's speed test servers. Each test runs at most 10 seconds per direction.</p>
+    </div></div>
+  </div>
+</div>
+
+<div class="card mt-3"><div class="card-body">
+  <h2 class="h6">Speed, last 7 days</h2>
+  {{if .SpeedChart}}{{.SpeedChart}}{{else}}<p class="small text-secondary mb-0">No data yet.</p>{{end}}
+</div></div>
+<div class="card mt-3"><div class="card-body">
+  <h2 class="h6">Latency, last 7 days</h2>
+  {{if .LatChart}}{{.LatChart}}<p class="small text-secondary mb-0">Red bands are internet outages.</p>{{else}}<p class="small text-secondary mb-0">No data yet.</p>{{end}}
+</div></div>
+{{end}}{{end}}

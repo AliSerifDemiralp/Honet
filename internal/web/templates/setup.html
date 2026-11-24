@@ -1,0 +1,35 @@
+{{define "content"}}
+<div class="row justify-content-center">
+  <div class="col-sm-10 col-md-6 col-lg-5">
+    <h1 class="h3 text-honet text-center">Honet</h1>
+    <p class="text-center text-secondary">Home network visibility</p>
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5">Create the admin account</h2>
+        <p class="small text-secondary">Enter the setup code printed in the honet log on the Pi:
+          <code>journalctl -u honet | grep "SETUP CODE"</code></p>
+        <form method="post" action="/setup" autocomplete="off">
+          <input type="hidden" name="csrf" value="{{.Data.Token}}">
+          <div class="mb-3">
+            <label class="form-label" for="code">Setup code</label>
+            <input class="form-control font-monospace" id="code" name="code" required placeholder="XXXX-XXXX-XXXX-XXXX">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" id="username" name="username" value="{{.Data.Username}}" maxlength="32" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="password">Password <span class="text-secondary small">(at least 10 characters)</span></label>
+            <input class="form-control" id="password" name="password" type="password" minlength="10" maxlength="72" autocomplete="new-password" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="confirm">Confirm password</label>
+            <input class="form-control" id="confirm" name="confirm" type="password" minlength="10" maxlength="72" autocomplete="new-password" required>
+          </div>
+          <button class="btn btn-success w-100" type="submit">Create account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

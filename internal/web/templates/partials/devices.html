@@ -1,0 +1,31 @@
+{{define "devices"}}{{with .Data}}
+<p class="mb-2">
+  {{if .Unknown}}<span class="badge text-bg-warning">⚠ {{.Unknown}} unknown device{{if gt .Unknown 1}}s{{end}}</span>
+  {{else if .Devices}}<span class="badge text-bg-success">✔ All devices recognised</span>{{end}}
+  <span class="small text-secondary ms-2">{{len .Devices}} total</span>
+</p>
+{{if not .Devices}}
+<p class="text-secondary">No devices yet. The first scan starts shortly after Honet starts.</p>
+{{else}}
+<div class="table-responsive">
+<table class="table table-sm table-hover align-middle">
+  <thead><tr><th></th><th>Name</th><th>IP</th><th class="d-none d-md-table-cell">MAC</th><th class="d-none d-lg-table-cell">Vendor</th><th class="d-none d-sm-table-cell">Type</th><th>Open ports</th><th class="d-none d-md-table-cell">Seen</th></tr></thead>
+  <tbody>
+  {{range .Devices}}
+  <tr{{if .Unknown}} class="row-unknown"{{end}}>
+    <td>{{if .Self}}<span title="This device">◆</span>{{else if .Unknown}}<span class="text-warning" title="Unknown">⚠</span>{{else}}<span class="text-success" title="Known">✔</span>{{end}}
+      {{if and .Watched (not .Online)}}<span class="badge text-bg-danger">offline</span>{{end}}</td>
+    <td><a href="/devices/{{.ID}}">{{.DisplayName}}</a></td>
+    <td class="text-nowrap">{{.LastIP}}</td>
+    <td class="d-none d-md-table-cell text-nowrap">{{if .MAC}}{{.MAC}}{{else}}—{{end}}{{if .Randomized}} <span class="badge text-bg-secondary">random</span>{{end}}</td>
+    <td class="d-none d-lg-table-cell">{{.Vendor}}</td>
+    <td class="d-none d-sm-table-cell">{{.TypeLabel}}</td>
+    <td>{{range .Ports}}{{if .Open}}{{if and .Risk (not .Acked)}}<span class="badge text-bg-danger port-risky" title="{{.Risk.Reason}}">{{.Port}} {{.Risk.Name}}</span>{{else}}<span class="badge text-bg-dark border">{{.Port}}</span>{{end}} {{end}}{{end}}</td>
+    <td class="d-none d-md-table-cell small text-secondary text-nowrap">{{ago .LastSeen}}</td>
+  </tr>
+  {{end}}
+  </tbody>
+</table>
+</div>
+{{end}}
+{{end}}{{end}}

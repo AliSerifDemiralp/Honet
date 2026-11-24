@@ -1,0 +1,16 @@
+{{define "health"}}
+<div class="card mt-4">
+  <div class="card-body">
+    <h2 class="h6 text-secondary">Honet host</h2>
+    {{if .UnderVoltageNow}}<div class="alert alert-danger py-2">Under-voltage detected — check the power supply.</div>
+    {{else if .UnderVoltageEver}}<div class="alert alert-warning py-2">Under-voltage occurred since boot — the power supply may be too weak.</div>{{end}}
+    <div class="row row-cols-2 row-cols-md-5 g-2">
+      {{with .TempC}}<div><div class="stat-label">CPU temp</div>{{printf "%.1f" (deref .)}} °C</div>{{end}}
+      {{if .MemTotal}}<div><div class="stat-label">Memory free</div>{{bytes .MemAvailable}} / {{bytes .MemTotal}}</div>{{end}}
+      {{if .DiskTotal}}<div><div class="stat-label">Disk free</div>{{bytes .DiskFree}} / {{bytes .DiskTotal}}</div>{{end}}
+      {{if .Uptime}}<div><div class="stat-label">Uptime</div>{{dur .Uptime}}</div>{{end}}
+      {{if .ProcessRSS}}<div><div class="stat-label">Honet memory</div>{{bytes .ProcessRSS}}</div>{{end}}
+    </div>
+  </div>
+</div>
+{{end}}

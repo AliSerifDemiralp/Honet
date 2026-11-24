@@ -1,0 +1,29 @@
+{{define "alerts"}}{{with .Data}}
+{{if .Gateway}}
+<div class="alert alert-danger" role="alert">
+  <strong>Your gateway's MAC address changed.</strong>
+  {{.Gateway.IP}} used to answer from <code>{{.Gateway.OldMAC}}</code> and now answers from <code>{{.Gateway.NewMAC}}</code>.
+  This happens when the router is replaced, but it is also what ARP spoofing looks like.
+  <form method="post" action="/gateway/confirm" class="mt-2" data-confirm="Only confirm if you replaced or reset your router. Continue?">
+    <input type="hidden" name="csrf" value="{{$.CSRF}}">
+    <button class="btn btn-sm btn-outline-light" type="submit">I replaced my router — accept the new MAC</button>
+  </form>
+</div>
+{{end}}
+{{range .Conflicts}}
+<div class="alert alert-warning" role="alert"><strong>IP conflict:</strong> {{.Detail}} ({{ago .At}}). See <a href="/events">Events</a>.</div>
+{{end}}
+{{if .Offline}}
+<div class="alert alert-warning" role="alert"><strong>Watched devices offline:</strong>
+  {{range $i, $d := .Offline}}{{if $i}}, {{end}}<a href="/devices/{{$d.ID}}">{{$d.DisplayName}}</a> (last seen {{ago $d.LastSeen}}){{end}}
+</div>
+{{end}}
+{{range .Risky}}
+<div class="alert alert-warning" role="alert"><strong>Risky port open:</strong>
+  <a href="/devices/{{.Device.ID}}">{{.Device.DisplayName}}</a> ({{.Device.LastIP}}) has {{range $i, $p := .Ports}}{{if $i}}, {{end}}{{$p.Risk.Name}} ({{$p.Port}}){{end}} open.
+</div>
+{{end}}
+{{if .InternetDown}}
+<div class="alert alert-danger" role="alert"><strong>Internet looks down:</strong> no internet target answered in the last measurement. See <a href="/internet">Internet</a>.</div>
+{{end}}
+{{end}}{{end}}

@@ -1,71 +1,27 @@
+# Secrets
 git_token.txt
-/git_token.txt
 
-# ----------------------
-# Python
-# ----------------------
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environments
-venv/
-.env/
-.venv/
-env/
-ENV/
-
-# Distribution / packaging
-build/
+# Build output
 dist/
-*.egg-info/
-.eggs/
+/honet
+/honet.exe
 
-# Logs
-*.log
-
-# Coverage / test
-.coverage
-htmlcov/
-.pytest_cache/
-
-# ----------------------
-# Environment variables
-# ----------------------
-.env
-.env.*
-*.env
-
-# ----------------------
 # SQLite
-# ----------------------
-*.sqlite3
 *.db
 *.db-journal
 *.db-wal
 *.db-shm
 
-# ----------------------
-# Files to ignore for scans
-# ----------------------
-*.lock
-.scan_state.json
-scan_result.json
-*.pdf
+# Logs and environment files
+*.log
+.env
+.env.*
 
-# ----------------------
-# Streamlit
-# ----------------------
-.streamlit/secrets.toml
-
-# ----------------------
-# IDE
-# ----------------------
+# IDE and OS
 .vscode/
 .idea/
-
-# ----------------------
-# OS
-# ----------------------
 .DS_Store
 Thumbs.db
+
+# Agent workspace
+.superpowers/

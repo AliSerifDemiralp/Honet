@@ -1,0 +1,26 @@
+{{define "content"}}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0 me-auto">Events</h1>
+  {{if .Unread}}
+  <form method="post" action="/events/read">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <button class="btn btn-outline-success btn-sm" type="submit">Mark all as read</button>
+  </form>
+  {{end}}
+</div>
+{{if not .Data}}<p class="text-secondary">Nothing has happened yet.</p>{{else}}
+<div class="table-responsive"><table class="table table-sm align-middle">
+  <thead><tr><th>When</th><th>Event</th><th>Device</th><th>Details</th></tr></thead>
+  <tbody>
+  {{range .Data}}
+  <tr>
+    <td class="small text-nowrap text-secondary">{{when .At}}</td>
+    <td>{{if not .Read}}<span class="badge text-bg-danger">new</span> {{end}}<span class="badge {{evclass .Kind}}">{{evlabel .Kind}}</span></td>
+    <td>{{if .DeviceID}}<a href="/devices/{{.DeviceID}}">{{if .DeviceName}}{{.DeviceName}}{{else}}device {{.DeviceID}}{{end}}</a>{{end}}</td>
+    <td class="small">{{.Detail}}</td>
+  </tr>
+  {{end}}
+  </tbody>
+</table></div>
+{{end}}
+{{end}}

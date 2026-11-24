@@ -1,0 +1,31 @@
+[Unit]
+Description=Honet home network monitor
+After=network-online.target time-sync.target
+Wants=network-online.target
+
+[Service]
+User=honet
+Group=honet
+ExecStart=/usr/local/bin/honet serve
+Environment=GOMEMLIMIT=64MiB
+StateDirectory=honet
+StateDirectoryMode=0700
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_PACKET AF_NETLINK
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryMax=96M
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

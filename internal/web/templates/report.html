@@ -1,0 +1,28 @@
+{{define "content"}}{{with .Data}}
+<div class="d-flex align-items-center mb-3">
+  <h1 class="h4 mb-0 me-auto">Honet network report</h1>
+  <button class="btn btn-success btn-sm no-print" type="button" data-print>Print / Save as PDF</button>
+</div>
+<p class="small text-secondary">Generated {{when .Generated}} · {{len .Devices}} devices</p>
+
+<h2 class="h5">Devices</h2>
+<table class="table table-sm">
+  <thead><tr><th>Name</th><th>Known</th><th>IP</th><th>MAC</th><th>Vendor</th><th>Type</th><th>Open ports</th><th>Last seen</th></tr></thead>
+  <tbody>
+  {{range .Devices}}
+  <tr><td>{{.DisplayName}}</td><td>{{if .Known}}yes{{else if .Self}}—{{else}}no{{end}}</td><td>{{.LastIP}}</td><td>{{.MAC}}</td>
+    <td>{{.Vendor}}</td><td>{{.TypeLabel}}</td><td>{{ports .OpenPorts}}</td><td>{{when .LastSeen}}</td></tr>
+  {{end}}
+  </tbody>
+</table>
+
+<h2 class="h5 mt-4">Last 7 days</h2>
+{{if not .Counts}}<p class="small">No events.</p>{{else}}
+<ul class="small">{{range .Counts}}<li>{{evlabel .Kind}}: {{.Count}}</li>{{end}}</ul>
+{{if gt .Total (len .Events)}}<p class="small text-secondary">Showing the newest {{len .Events}} of {{.Total}} events.</p>{{end}}
+<table class="table table-sm small">
+  <thead><tr><th>When</th><th>Event</th><th>Device</th><th>Details</th></tr></thead>
+  <tbody>{{range .Events}}<tr><td>{{when .At}}</td><td>{{evlabel .Kind}}</td><td>{{.DeviceName}}</td><td>{{.Detail}}</td></tr>{{end}}</tbody>
+</table>
+{{end}}
+{{end}}{{end}}

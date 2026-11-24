@@ -1,0 +1,72 @@
+{{define "content"}}
+{{template "alerts" .}}
+{{with .Data}}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0 me-auto">Dashboard</h1>
+  <span class="small text-secondary">
+    {{if .Scan.Running}}<span class="spinner-border spinner-border-sm text-success" aria-hidden="true"></span> {{.Scan.Running}}
+    {{else if not .Scan.LastRun.IsZero}}Last scan {{ago .Scan.LastRun}}{{else}}No scan yet{{end}}
+  </span>
+  <form method="post" action="/scan">
+    <input type="hidden" name="csrf" value="{{$.CSRF}}">
+    <button class="btn btn-success btn-sm" type="submit">▶ Scan now</button>
+  </form>
+</div>
+{{if .Scan.LastErr}}<div class="alert alert-secondary small">Last scan failed: {{.Scan.LastErr}}</div>{{end}}
+
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-3">
+  <div class="col"><a class="card stat-card h-100 text-decoration-none" href="/devices"><div class="card-body">
+    <div class="stat-label">Total devices</div><div class="stat-value">{{len .Devices}}</div></div></a></div>
+  <div class="col"><a class="card stat-card h-100 text-decoration-none" href="/devices"><div class="card-body">
+    <div class="stat-label">Online now</div><div class="stat-value text-honet">{{.Online}}</div></div></a></div>
+  <div class="col"><a class="card stat-card h-100 text-decoration-none" href="/devices"><div class="card-body">
+    <div class="stat-label">Unknown</div><div class="stat-value{{if .Unknown}} text-warning{{end}}">{{.Unknown}}</div></div></a></div>
+  <div class="col"><a class="card stat-card h-100 text-decoration-none" href="/devices"><div class="card-body">
+    <div class="stat-label">Devices with risky ports</div><div class="stat-value{{if .Risky}} text-danger{{end}}">{{len .Risky}}</div></div></a></div>
+</div>
+{{if not .Devices}}<p class="text-secondary">No devices yet. Press <strong>Scan now</strong> or check the scan range in <a href="/settings">Settings</a>.</p>{{end}}
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card h-100"><div class="card-body">
+      <div class="d-flex align-items-center mb-2"><h2 class="h6 mb-0 me-auto">People</h2><a class="small" href="/people">Manage</a></div>
+      {{if not .People}}<p class="text-secondary small mb-0">No people yet. Link phones to people on the <a href="/people">People</a> page.</p>{{else}}
+      <ul class="list-unstyled mb-0">
+        {{range .People}}<li class="d-flex align-items-center py-1">
+          <span class="me-auto">{{.Name}}</span>
+          {{if not .Known}}<span class="badge text-bg-secondary">not seen yet</span>
+          {{else if .Home}}<span class="badge text-bg-success">Home</span>
+          {{else}}<span class="badge text-bg-secondary">Away</span>{{end}}
+          {{if .Known}}<span class="small text-secondary ms-2">{{ago .Since}}</span>{{end}}
+        </li>{{end}}
+      </ul>{{end}}
+    </div></div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card h-100"><div class="card-body">
+      <div class="d-flex align-items-center mb-2"><h2 class="h6 mb-0 me-auto">Internet</h2><a class="small" href="/internet">Details</a></div>
+      <div class="row row-cols-2 row-cols-md-4 g-2 mb-2">
+        {{range .Latest}}<div><div class="stat-label">{{if eq .Target "gateway"}}Router{{else}}{{.Target}}{{end}}</div>
+          {{if ge .LossPct 100.0}}<span class="text-danger">no reply</span>{{else}}{{ms .AvgMs}}{{if gt .LossPct 0.0}} <span class="text-warning small">{{printf "%.0f" .LossPct}}% loss</span>{{end}}{{end}}</div>{{end}}
+        {{with .LastSpeed}}{{if .Error}}<div><div class="stat-label">Speed test</div><span class="text-warning small">failed {{ago .At}}</span></div>
+        {{else}}<div><div class="stat-label">Download</div>{{printf "%.1f" .DownMbps}} Mbps</div><div><div class="stat-label">Upload</div>{{printf "%.1f" .UpMbps}} Mbps</div>{{end}}{{end}}
+      </div>
+      {{if not .LastSpeed}}<p class="text-secondary small mb-1">No speed test yet.</p>{{end}}
+      {{if not .Latest}}<p class="text-secondary small mb-1">No latency measurements yet.</p>{{end}}
+      {{.LatChart}}
+    </div></div>
+  </div>
+</div>
+
+<div class="card mt-3"><div class="card-body">
+  <div class="d-flex align-items-center mb-2"><h2 class="h6 mb-0 me-auto">Recent events</h2><a class="small" href="/events">All events</a></div>
+  {{if not .Events}}<p class="text-secondary small mb-0">Nothing has happened yet.</p>{{else}}
+  <ul class="list-unstyled small mb-0">{{range .Events}}
+    <li class="py-1"><span class="text-secondary">{{ago .At}}</span>
+      <span class="badge {{evclass .Kind}}">{{evlabel .Kind}}</span>
+      {{if .DeviceID}}<a href="/devices/{{.DeviceID}}">{{if .DeviceName}}{{.DeviceName}}{{else}}device {{.DeviceID}}{{end}}</a>{{end}} {{.Detail}}</li>
+  {{end}}</ul>{{end}}
+</div></div>
+{{template "health" .Health}}
+{{end}}
+{{end}}

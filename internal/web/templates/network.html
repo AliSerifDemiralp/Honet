@@ -1,0 +1,19 @@
+{{define "content"}}
+{{template "alerts" .}}
+{{with .Data}}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0 me-auto">Devices</h1>
+  <span class="small text-secondary">
+    {{if .Scan.Running}}<span class="spinner-border spinner-border-sm text-success" aria-hidden="true"></span> {{.Scan.Running}}
+    {{else}}Last scan {{ago .Scan.LastRun}}{{end}}
+  </span>
+  <form method="post" action="/scan">
+    <input type="hidden" name="csrf" value="{{$.CSRF}}">
+    <input type="hidden" name="next" value="/devices">
+    <button class="btn btn-success btn-sm" type="submit">▶ Scan now</button>
+  </form>
+</div>
+{{if .Scan.LastErr}}<div class="alert alert-secondary small">Last scan failed: {{.Scan.LastErr}}</div>{{end}}
+{{end}}
+{{template "devices" .}}
+{{end}}

@@ -1,0 +1,110 @@
+{{define "content"}}{{with .Data}}{{$d := .Device}}
+<nav class="mb-2 small"><a href="/devices">← Devices</a></nav>
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0 me-auto">{{$d.DisplayName}}
+    {{if $d.Self}}<span class="badge text-bg-secondary">this device</span>{{else if $d.Unknown}}<span class="badge text-bg-warning">unknown</span>{{else}}<span class="badge text-bg-success">known</span>{{end}}
+    {{if and $d.Watched (not $d.Online)}}<span class="badge text-bg-danger">offline</span>{{end}}
+  </h1>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card"><div class="card-body">
+      <dl class="row mb-0 small">
+        <dt class="col-4">IP</dt><dd class="col-8">{{$d.LastIP}}</dd>
+        <dt class="col-4">MAC</dt><dd class="col-8">{{if $d.MAC}}{{$d.MAC}}{{else}}—{{end}}{{if $d.Randomized}} <span class="badge text-bg-secondary">random</span>{{end}}</dd>
+        <dt class="col-4">Vendor</dt><dd class="col-8">{{if $d.Vendor}}{{$d.Vendor}}{{else}}—{{end}}</dd>
+        <dt class="col-4">Hostname</dt><dd class="col-8">{{if $d.Hostname}}{{$d.Hostname}}{{else}}—{{end}}</dd>
+        <dt class="col-4">Type</dt><dd class="col-8">{{$d.TypeLabel}}{{if $d.ManualType}} <span class="text-secondary">(set by you; guess: {{typelabel $d.AutoType}})</span>{{end}}</dd>
+        {{if $d.HTTPInfo}}<dt class="col-4">Web page</dt><dd class="col-8">{{$d.HTTPInfo}}</dd>{{end}}
+        {{if $d.Gateway}}<dt class="col-4">Role</dt><dd class="col-8">Default gateway</dd>{{end}}
+        <dt class="col-4">First seen</dt><dd class="col-8">{{when $d.FirstSeen}}</dd>
+        <dt class="col-4">Last seen</dt><dd class="col-8">{{when $d.LastSeen}} ({{ago $d.LastSeen}})</dd>
+      </dl>
+    </div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card"><div class="card-body">
+      <h2 class="h6">Identify</h2>
+      <form method="post" action="/devices/{{$d.ID}}">
+        <input type="hidden" name="csrf" value="{{$.CSRF}}">
+        <div class="mb-2"><label class="form-label small" for="name">Name</label>
+          <input class="form-control form-control-sm" id="name" name="name" value="{{$d.Name}}" maxlength="64"></div>
+        <div class="mb-2"><label class="form-label small" for="type">Type</label>
+          <select class="form-select form-select-sm" id="type" name="type">
+            <option value="">Automatic ({{typelabel $d.AutoType}})</option>
+            {{range .Types}}<option value="{{.}}"{{if eq . $d.ManualType}} selected{{end}}>{{typelabel .}}</option>{{end}}
+          </select></div>
+        <div class="mb-2"><label class="form-label small" for="notes">Notes</label>
+          <textarea class="form-control form-control-sm" id="notes" name="notes" rows="2" maxlength="500">{{$d.Notes}}</textarea></div>
+        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="known" name="known"{{if $d.Known}} checked{{end}}>
+          <label class="form-check-label" for="known">I know this device</label></div>
+        <button class="btn btn-success btn-sm" type="submit">Save</button>
+      </form>
+      <hr>
+      <h2 class="h6">Watch</h2>
+      <form method="post" action="/devices/{{$d.ID}}/watch" class="row g-2 align-items-center">
+        <input type="hidden" name="csrf" value="{{$.CSRF}}">
+        <div class="col-auto form-check ms-2"><input class="form-check-input" type="checkbox" id="watch" name="watch"{{if $d.Watched}} checked{{end}}>
+          <label class="form-check-label small" for="watch">Alert when offline for</label></div>
+        <div class="col-auto"><input class="form-control form-control-sm" type="number" name="minutes" min="0" max="10080" value="{{if $d.Watched}}{{$d.WatchAfter.Minutes}}{{end}}" placeholder="default" aria-label="minutes"></div>
+        <div class="col-auto small">minutes</div>
+        <div class="col-auto"><button class="btn btn-outline-success btn-sm" type="submit">Save</button></div>
+      </form>
+    </div></div>
+  </div>
+</div>
+
+<h2 class="h5 mt-4">Ports</h2>
+<form class="row g-2 align-items-end mb-3" method="post" action="/devices/{{$d.ID}}/scan">
+  <input type="hidden" name="csrf" value="{{$.CSRF}}">
+  <div class="col-auto"><label class="form-label small mb-0" for="profile">Ports to scan</label>
+    <select class="form-select form-select-sm" id="profile" name="profile">
+      {{range .Profiles}}<option value="{{.ID}}"{{if and (eq .ID "custom") $.Data.Custom}} selected{{end}}>{{.Label}}</option>{{end}}
+    </select></div>
+  <div class="col-auto"><label class="form-label small mb-0" for="custom">Custom list</label>
+    <input class="form-control form-control-sm" id="custom" name="custom" value="{{.Custom}}" placeholder="22,80,8000-8100" maxlength="200"></div>
+  <div class="col-auto"><button class="btn btn-outline-success btn-sm" type="submit">Scan ports</button></div>
+  <div class="col-12 small text-secondary">
+    {{if .Scanning}}<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Scanning {{.Scanning}} ports…
+      <button class="btn btn-outline-warning btn-sm ms-2" type="submit" form="stop-scan">Stop</button>
+    {{else if .Queued}}A port scan is queued. <button class="btn btn-outline-warning btn-sm ms-2" type="submit" form="stop-scan">Cancel</button>
+    {{else}}Wide scans take minutes on a Pi; the periodic scan always uses the common list.{{end}}
+  </div>
+</form>
+<form id="stop-scan" method="post" action="/devices/{{$d.ID}}/scan/stop"><input type="hidden" name="csrf" value="{{$.CSRF}}"></form>
+{{if not $d.Ports}}<p class="text-secondary small">{{if $d.Probed}}No open ports found.{{else}}Not probed yet.{{end}}</p>{{else}}
+<div class="table-responsive"><table class="table table-sm align-middle">
+  <thead><tr><th>Port</th><th>State</th><th>Note</th><th class="d-none d-md-table-cell">Last change</th><th></th></tr></thead>
+  <tbody>
+  {{range $d.Ports}}
+  <tr>
+    <td>{{.Port}}{{with service .Port}} <span class="text-secondary small">{{.}}</span>{{end}}</td>
+    <td>{{if .Open}}<span class="badge text-bg-success">open</span>{{else}}<span class="badge text-bg-secondary">closed</span>{{end}}</td>
+    <td class="small">{{with .Risk}}<strong>{{.Name}}:</strong> {{.Reason}}{{end}}</td>
+    <td class="d-none d-md-table-cell small text-secondary">{{when .LastSeen}}</td>
+    <td>{{if and .Open .Risk}}
+      <form method="post" action="/devices/{{$d.ID}}/ports/{{.Port}}/ack">
+        <input type="hidden" name="csrf" value="{{$.CSRF}}">
+        <input type="hidden" name="acked" value="{{if .Acked}}0{{else}}1{{end}}">
+        <button class="btn btn-sm {{if .Acked}}btn-outline-secondary{{else}}btn-outline-warning{{end}}" type="submit">{{if .Acked}}Warn again{{else}}Mark as intentional{{end}}</button>
+      </form>{{end}}</td>
+  </tr>
+  {{end}}
+  </tbody>
+</table></div>
+{{end}}
+
+<h2 class="h5 mt-4">IP history</h2>
+<ul class="small">{{range .IPs}}<li>{{.IP}} — {{when .FirstSeen}} to {{when .LastSeen}}</li>{{end}}</ul>
+
+<h2 class="h5 mt-4">Events</h2>
+{{if not .Events}}<p class="text-secondary small">No events.</p>{{else}}
+<ul class="list-unstyled small">{{range .Events}}<li><span class="text-secondary">{{when .At}}</span> <span class="badge {{evclass .Kind}}">{{evlabel .Kind}}</span> {{.Detail}}</li>{{end}}</ul>
+{{end}}
+
+<form method="post" action="/devices/{{$d.ID}}/delete" class="mt-4" data-confirm="Forget this device and its history?">
+  <input type="hidden" name="csrf" value="{{$.CSRF}}">
+  <button class="btn btn-outline-danger btn-sm" type="submit">Forget device</button>
+</form>
+{{end}}{{end}}

@@ -1,0 +1,54 @@
+{{define "content"}}{{with .Data}}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0 me-auto">People</h1>
+  <form method="post" action="/people" class="d-flex gap-2">
+    <input type="hidden" name="csrf" value="{{$.CSRF}}">
+    <input class="form-control form-control-sm" name="name" maxlength="40" placeholder="Name" aria-label="Name" required>
+    <button class="btn btn-success btn-sm text-nowrap" type="submit">Add person</button>
+  </form>
+</div>
+<p class="small text-secondary">Someone counts as home while one of their devices was seen on the network in the last {{.Window}} minutes.
+Phones that sleep or use a random Wi-Fi address may make this flicker; link the device the phone uses on your Wi-Fi.</p>
+
+{{if not .People}}<p class="text-secondary">No people yet. Add someone and link their phone.</p>{{end}}
+{{range .People}}
+<div class="card mb-3"><div class="card-body">
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+    <h2 class="h5 mb-0 me-auto">{{.Name}}
+      {{if not .Known}}<span class="badge text-bg-secondary">Unknown</span>
+      {{else if .Home}}<span class="badge text-bg-success">Home</span>
+      {{else}}<span class="badge text-bg-secondary">Away</span>{{end}}
+      {{if .Known}}<span class="small text-secondary">since {{when .Since}}</span>{{end}}
+    </h2>
+    <form method="post" action="/people/{{.ID}}/delete" data-confirm="Remove {{.Name}} and their history?">
+      <input type="hidden" name="csrf" value="{{$.CSRF}}">
+      <button class="btn btn-outline-danger btn-sm" type="submit">Remove</button>
+    </form>
+  </div>
+  {{.Strip}}
+  <h3 class="h6 mt-3">Devices</h3>
+  {{if not .Devices}}<p class="small text-secondary">No devices linked.</p>{{else}}
+  <ul class="list-unstyled small">
+    {{$pid := .ID}}
+    {{range .Devices}}
+    <li class="d-flex align-items-center gap-2 mb-1">
+      <a href="/devices/{{.ID}}">{{.DisplayName}}</a> <span class="text-secondary">{{.LastIP}} · seen {{ago .LastSeen}}</span>
+      <form method="post" action="/people/{{$pid}}/unlink">
+        <input type="hidden" name="csrf" value="{{$.CSRF}}">
+        <input type="hidden" name="device" value="{{.ID}}">
+        <button class="btn btn-link btn-sm p-0 text-danger" type="submit">unlink</button>
+      </form>
+    </li>
+    {{end}}
+  </ul>{{end}}
+  <form method="post" action="/people/{{.ID}}/link" class="d-flex gap-2">
+    <input type="hidden" name="csrf" value="{{$.CSRF}}">
+    <select class="form-select form-select-sm" name="device" aria-label="Device to link" required>
+      <option value="">Choose a device…</option>
+      {{range $.Data.Devices}}{{if not .Self}}<option value="{{.ID}}">{{.DisplayName}} ({{.LastIP}}, {{.MAC}})</option>{{end}}{{end}}
+    </select>
+    <button class="btn btn-outline-success btn-sm text-nowrap" type="submit">Link device</button>
+  </form>
+</div></div>
+{{end}}
+{{end}}{{end}}

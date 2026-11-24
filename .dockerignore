@@ -1,31 +1,9 @@
-# Deploy files
-deploy/
-docs/
-
-# Git
-.git/
-.github/
-.gitignore
-
-# Python
-__pycache__/
-*.pyc
-venv/
-
-# Database & runtime files
+.git
+.superpowers
+dist
+data
 *.db
 *.db-wal
 *.db-shm
-*.lock
-.scan_state.json
-scan_result.json
-
-# Secrets
 git_token.txt
-
-# Streamlit
-.streamlit/secrets.toml
-
-# Misc
-README.md
-*.pdf
+docs

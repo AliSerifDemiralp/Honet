@@ -1,17 +1,26 @@
 # Honet
 
-**A tiny home network monitor for the Raspberry Pi Zero W.**
+[![CI](https://github.com/AliSerifDemiralp/Honet/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AliSerifDemiralp/Honet/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/AliSerifDemiralp/Honet)](https://github.com/AliSerifDemiralp/Honet/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+**A tiny home network monitor, built for the Raspberry Pi Zero W.**
 
 Honet answers one question: *which devices are on my network, and should they
-be there?* It is a single static Go binary (about 15 MB) that runs on a
-first-generation Raspberry Pi Zero W (ARMv6, 512 MB RAM) with no Python, no
-nmap and nothing to install from the package manager. Open its web page from
-your phone and you see every device, what it probably is, which ports it has
-open, who is home and how your internet connection is doing.
+be there?* It is a single static Go binary (about 15 MB) built for the
+first-generation Raspberry Pi Zero W (ARMv6, 512 MB RAM): no Python, no nmap
+and nothing to install from the package manager. Open its web page from your
+phone and you see every device, what it probably is, which ports it has open,
+who is home and how your internet connection is doing.
 
-![Dashboard](docs/images/dashboard.png)
+![Honet: dashboard, device list and a port scan that finds Telnet](docs/images/demo.gif)
 
 > All screenshots use made-up demo data.
+
+> **Project status:** Honet is tested with its automated test suite and in
+> Docker (including an emulated ARMv6 build). It has **not yet been tested on
+> real Raspberry Pi hardware**, so treat the Pi-specific figures below as
+> targets. Reports from Pi owners are welcome.
 
 ## Contents
 
@@ -29,6 +38,8 @@ open, who is home and how your internet connection is doing.
 - [Security](#security)
 - [Troubleshooting](#troubleshooting)
 - [Development](#development)
+- [How Honet was built](#how-honet-was-built)
+- [License](#license)
 
 ## Features
 
@@ -79,6 +90,8 @@ notifications and has no cloud component.
 
 ## Screenshots
 
+![Dashboard](docs/images/dashboard.png)
+
 | | |
 |---|---|
 | ![Devices](docs/images/devices.png) **Devices.** Unknown devices first, with vendor, guessed type and open ports. Risky ports are red. | ![Device](docs/images/device.png) **Device page.** Identify a device, watch it, scan its ports with a chosen profile, see its history. |
@@ -98,14 +111,16 @@ always on and connected to your home network (Wi-Fi or Ethernet).
 
 ## Install on a Raspberry Pi
 
-Works on Raspberry Pi OS (Lite is fine), 32- or 64-bit, on every Pi from the
-original Zero W to the Pi 5. The steps below run **on the Pi** over SSH.
+Built for Raspberry Pi OS (Lite is fine), 32- or 64-bit. Binaries are
+provided for every Pi generation, from the original Zero W to the Pi 5, but
+none of them has been tested on real hardware yet (see *Project status*).
+The steps below run **on the Pi** over SSH.
 
 **1. Download the release** for your Pi. Use `armv6` for the Pi Zero, Zero W
 and Pi 1; `armv7` for the Pi 2 and 3 on 32-bit OS; `arm64` for 64-bit OS.
 
 ```sh
-VERSION=v2.0.0
+VERSION=v2.0.1
 ARCH=armv6
 BASE=https://github.com/AliSerifDemiralp/Honet/releases/download/$VERSION
 mkdir -p ~/honet && cd ~/honet
@@ -249,8 +264,8 @@ internet status, recent events and Pi health. *Scan now* starts a device scan.
 - mark a risky port as intentional (for example SMB on your NAS),
 - see its IP history and events, or forget it.
 
-Wide scans take a while on a Pi Zero (all 65535 ports of one device take
-several minutes). The hourly scan always uses the common list.
+Wide scans take a while: expect all 65535 ports of one device to take
+several minutes on a Pi Zero. The hourly scan always uses the common list.
 
 **People.** Add a person and link the devices they carry. Phones that use a
 private (random) Wi-Fi address per network keep the same address on your
@@ -277,8 +292,8 @@ are then unknown, and scans of a routed range are slower. Only private ranges
 ### Internet data use
 
 Each speed test direction stops after 10 seconds or 100 MB, whichever comes
-first. On a Pi Zero W (about 25 Mbps over Wi-Fi) one test uses about 60 MB,
-so the default interval of 3 hours uses about 0.5 GB a day. Change the
+first. A Pi Zero W manages about 25 Mbps over Wi-Fi, so one test there should
+use about 60 MB, and the default interval of 3 hours about 0.5 GB a day. Change the
 interval or set it to 0 to turn scheduled tests off; *Test speed now* still
 works. Results close to the Pi's own limit are marked "may be limited by the
 Pi".
@@ -429,3 +444,22 @@ Tagged versions (`v*`) are built by GitHub Actions: the four binaries,
 `install.sh`, `honet.service` and `sha256sums.txt` are attached to the GitHub
 release, and the multi-architecture image is pushed to
 `ghcr.io/aliserifdemiralp/honet`.
+
+## How Honet was built
+
+Honet v2 was written with AI assistance: I designed and directed the
+project, and [Claude Code](https://claude.com/claude-code) wrote most of the
+code under my review. Commits where it took part carry a
+`Co-Authored-By: Claude` line.
+
+The process is in the open: [`docs/superpowers/`](docs/superpowers/) holds
+the design spec and the phase-by-phase implementation plans the code was
+built from. Every change was made test-first, and the security behaviour
+(sign-in, CSRF, lockout, headers, input limits) was checked both by the test
+suite and against a running container before release.
+
+## License
+
+Honet is free software under the [MIT License](LICENSE). You may use, copy,
+modify and distribute it, including commercially, as long as the copyright
+notice is kept.
